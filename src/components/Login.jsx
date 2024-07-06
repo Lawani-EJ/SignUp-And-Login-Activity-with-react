@@ -1,31 +1,33 @@
-import React from 'react'
-import { useForm } from 'react-hook-form'
-import "../App.css"
+import React, { useState } from 'react';
+import "../App.css";
+
 const Login = () => {
-    const {register, handleSubmit, formState: {errors} } = useForm();
-    const onSubmit = (data) => {
-        const userData = JSON.parse(localStorage.getItem(data.email));
-        if (userData) {
-            if (userData.Password === data.Password) {
-                console.log(userData.name + "You are successfully Logged in")
-            } else {
-                console.log("Email or Password is incorrect it is not matching with our records")
-            }
-            } else{
-                console.log("Email is not registered")
-            }
-        }
-  return (
-    <>
-    <p className="title">Login Form</p>
-    <form className='App' onSubmit={handleSubmit(onSubmit)}>
-      <input type="email" {...register("email", {required: true})}/>
-      {errors.email && <span style={{color: "red"}}>Email Is Mandatory!</span>}
-      <input type="password" {...register("Password")}/>
-      <input type={"submit"} style={{backgroundColor: "red"}} />
-    </form>
-    </>
-  )
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+
+    async function login() {
+        console.warn(email, password);
+        let item = { email, password };
+        let result = await fetch("http://ecommerce.reworkstaging.name.ng/v2/merchants/login", {
+            method: 'POST',
+            headers: {
+                "Content-type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify(item)
+        });
+        result = await result.json();
+        localStorage.setItem("user-info", JSON.stringify(result));
+    }
+
+    return (
+        <div className='col-sm-6'>
+            <h1 className='display-1'>Login Page</h1>
+            <input placeholder='email' onChange={(e) => setEmail(e.target.value)} type='text' className='form-control'></input>
+            <input placeholder='password' onChange={(e) => setPassword(e.target.value)} type='password' className='form-control'></input>
+            <button type="button" onClick={login} className="btn btn-secondary">Login</button>
+        </div>
+    );
 }
 
-export default Login
+export default Login;
